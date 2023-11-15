@@ -126,5 +126,5 @@ Class TextIOBaseLite
 	
 	Public Sub Class_Terminate()
 		close()
-    End Sub
+	End Sub
 End Class
