@@ -4,8 +4,8 @@ TextIOBase porté en VBScript. L'objectif est d'implémenter en VBS la classe py
 ## Usage
 
     dim ofichier : set ofichier = New TextIOBaseLite
-    ofichier.open nom_fichier, "r", "utf-8", "\r\n"
-    dim lignes
+    ofichier.open "C:\exemple.txt", "r", "utf-8", "\r\n"
+    dim lignes, i
     lignes = ofichier.readlines()
     For i = 0 To UBound(lignes)
       WScript.Echo lignes(i)
