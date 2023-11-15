@@ -10,7 +10,7 @@ Class TextIOBaseLite
 	
 	
 	Public property get closed
-		closed =  bclosed
+		closed = bclosed
 	End Property
 	
 	Private Property let closed(value)
@@ -23,6 +23,13 @@ Class TextIOBaseLite
 			ostream.open()
 			nomfichier = nom_fichier
 			ostream.LoadFromFile(nomfichier)
+			closed = False
+			anewline = newline
+		End If
+		If mode = "w" Then
+			ostream.Charset = encoding
+			ostream.open()
+			nomfichier = nom_fichier
 			closed = False
 			anewline = newline
 		End If
