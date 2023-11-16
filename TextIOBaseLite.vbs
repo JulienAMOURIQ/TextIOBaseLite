@@ -83,7 +83,7 @@ Class TextIOBaseLite
 	
 	Public Sub write(strtexte)
 		If writable() Then
-			ostream.WriteText strtexte
+			ostream.WriteText Replace(strtexte, "\n", LineSeparatorChar())
 			mecriture = True
 		Else
 			Err.Raise vbObjectError + 513,,"Fichier fermé"
