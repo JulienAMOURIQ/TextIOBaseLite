@@ -1,0 +1,75 @@
+<job>
+<script language="VBScript" src="TextIOBaseLite.vbs"/>
+<script language="VBScript">
+	Function extraire_section(ligne)
+		extraire_section = Mid(ligne, 2, InStr(1, ligne, "]") - 2)
+	End Function
+
+	Function extraire_cle(ligne)
+		extraire_cle = Left(ligne, InStr(1, ligne, "=") - 1)
+	End Function
+
+	Function extraire_valeur(ligne)
+		extraire_valeur = Right(ligne, Len(ligne) - InStr(1, ligne, "="))
+	End Function
+
+	Function est_une_section(ligne)
+		' Si la ligne est de la forme [section]
+		est_une_section = InStr(1, ligne, "[") = 1 And InStr(1, ligne, "]")
+	End Function
+
+	Function est_une_affectation(ligne)
+		' Si la ligne est de la forme cle=valeur
+		est_une_affectation = InStr(1, ligne, "=") > 0
+	End Function
+
+
+	' Définition de la fonction lire_ini
+	'  Entrée : nom de fichier ini
+	'  Sortie : dictionnaire
+	'			=> dico_ini(section)(cle) donne la valeur correspondante
+	Function lire_ini(nom_fichier)
+		dim ofichier
+		set ofichier = open( nom_fichier, "r", "utf-8", "\r\n")
+		dim lignes
+		lignes = ofichier.readlines()
+		
+		dim dico_ini : Set dico_ini = CreateObject("Scripting.Dictionary") ' Initialiser le dictionnaire ini
+		dim i
+		dim valeur
+		dim cle
+		dim section
+		' Parcourir chaque ligne
+		For i = 0 To UBound(lignes)
+			If est_une_section(lignes(i)) Then
+				section = extraire_section(lignes(i))
+				' Ajouter la section au dictionnaire ini
+				If Not dico_ini.Exists(section) Then dico_ini.Add section, CreateObject("Scripting.Dictionary")
+			ElseIf est_une_affectation(lignes(i)) Then 
+				cle = extraire_cle(lignes(i))
+				valeur = extraire_valeur(lignes(i))
+				' Ajouter la clé et la valeur à la section courante du dictionnaire ini
+				dico_ini(section).Add cle, valeur
+			End If
+		Next
+		set lire_ini = dico_ini
+	End Function
+
+	dim fso : Set fso = CreateObject("Scripting.FileSystemObject")
+	' Lecture des arguments
+	dim args : Set args = WScript.Arguments
+	dim nom_fichier : nom_fichier = args.Item(0)
+	dim section : section = args.Item(1)
+	dim cle : cle = args.Item(2)
+
+	' Vérification de l'existence du fichier
+	If NOT fso.FileExists(nom_fichier) Then
+		Err.Raise vbObjectError + 513,,"Fichier introuvable: "& nom_fichier
+	Else
+		dim mon_dico
+		set mon_dico = lire_ini(nom_fichier) ' Appel de la fonction lire_ini
+		WScript.Echo mon_dico(section)(cle) 
+	End If
+</script>
+</job>
+
