@@ -1,3 +1,5 @@
+option Explicit
+
 Class TextIOBaseLite
 	Private ostream, bclosed, nomfichier, anewline
 	Private mecriture
@@ -8,7 +10,6 @@ Class TextIOBaseLite
 		mecriture = False
 	End Sub
 	
-	
 	Public property get closed
 		closed = bclosed
 	End Property
@@ -17,7 +18,7 @@ Class TextIOBaseLite
 		bclosed = value
 	End Property
   
-	Public Sub open(nom_fichier, mode, encoding, newline)
+	Public Sub private_open(nom_fichier, mode, encoding, newline)
 		If mode = "r" Then
 			ostream.Charset = encoding
 			ostream.open()
@@ -70,16 +71,26 @@ Class TextIOBaseLite
 
 	Public Function read()
 		If readable() Then
-			read = ostream.ReadText ' Lecture du contenu
+			dim strtmp
+			strtmp = ostream.ReadText ' Lecture du contenu
+			If anewline = "None" Then
+				strtmp = replace(strtmp, vbCrLf, vbLf )
+				strtmp = replace(strtmp, vbCr, vbLf )
+			elseIf not anewline = "" Then
+				strtmp = replace(strtmp, vbCrLf, vbLf)
+				strtmp = replace(strtmp, vbCr, vbLf)
+				strtmp = replace(strtmp, vbLf, LineSeparatorChar())
+			End If
+			read = strtmp
 		Else
 			Err.Raise vbObjectError + 513,,"Fichier fermé"
 		End If
 	End Function
 	
 	Public Function readlines()
-		dim content
-		content = read()
-		readlines = Split(content, LineSeparatorChar()) ' Séparer le contenu en lignes
+			dim content
+			content = read() ' Lecture du contenu
+			readlines = Split(content, LineSeparatorChar()) ' Séparer le contenu en lignes
 	End Function
 	
 	Public Function writable()
@@ -135,8 +146,15 @@ Class TextIOBaseLite
 		End if
 	End Sub
 	
-	
 	Public Sub Class_Terminate()
 		close()
 	End Sub
 End Class
+
+
+Public Function open(nom_fichier, mode, encoding, newline)
+	dim ofichier
+	set ofichier = New TextIOBaseLite
+	ofichier.private_open nom_fichier, mode, encoding, newline
+	set open = ofichier
+End Function
