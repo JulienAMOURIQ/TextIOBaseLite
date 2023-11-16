@@ -67,14 +67,19 @@ Class TextIOBaseLite
 			Err.Raise vbObjectError + 513,,"Fichier fermé"
 		End If
 	End Function
-	
-	Public Function readlines()
+
+	Public Function read()
 		If readable() Then
-			dim content : content = ostream.ReadText ' Lecture du contenu
-			readlines = Split(content, LineSeparatorChar()) ' Séparer le contenu en lignes
+			read = ostream.ReadText ' Lecture du contenu
 		Else
 			Err.Raise vbObjectError + 513,,"Fichier fermé"
 		End If
+	End Function
+	
+	Public Function readlines()
+		dim content
+		content = read()
+		readlines = Split(content, LineSeparatorChar()) ' Séparer le contenu en lignes
 	End Function
 	
 	Public Function writable()
